@@ -24,6 +24,29 @@ const int MINIMUM_ALLOC = sizeof(int) * 2;
 // of the beginning of the heap.
 void *heap_begin = NULL;
 
+//**********************MALLOC HELPER FUNCTIONS ********************************
+int perfect_fit_check(size_t size_block_wanted,unit8_t * ptr_to_block ){
+  unit32_t * ptr_to_block =   (unit32_t * )ptr_to_block ;
+  size_t size_of_memory_block = (size_t ) ptr_to_block;
+  if ((size_of_memory_block /2 ) > size_block_wanted ){
+    return 0;
+  }else if ((size_of_memory_block /2 ) == size_block_wanted ){
+    //allocate
+    return 1;
+  }else{ printf("WTF"); return 0;}
+  
+}
+
+void allocate (
+
+
+
+
+
+//**********************MALLOC HELPER FUNCTIONS ********************************
+
+
+
 
 void *malloc(size_t request_size) {
 
@@ -35,6 +58,7 @@ void *malloc(size_t request_size) {
         heap_begin = mmap(NULL, HEAPSIZE, PROT_READ|PROT_WRITE, MAP_ANON|MAP_PRIVATE, -1, 0);
         atexit(dump_memory_map);
     }
+    void * free_list = heap_begin ;
 
 
 }
