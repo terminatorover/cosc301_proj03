@@ -11,6 +11,13 @@
 #define FALSE 0
 #endif
 
+//helps to get both pointers to the a fitting free block and the last free block before that 
+struct blocks{
+  uint8_t * first_free;
+  uint8_t * second_free ;
+
+};
+
 // function declarations
 void *malloc(size_t);
 void free(void *);
@@ -25,8 +32,10 @@ const int MINIMUM_ALLOC = sizeof(int) * 2;
 void *heap_begin = NULL;
 
 //**********************MALLOC HELPER FUNCTIONS ********************************
-int perfect_fit_check(size_t size_block_wanted,unit8_t * ptr_to_block ){
-  unit32_t * ptr_to_block =   (unit32_t * )ptr_to_block ;
+//perfect_fit_check , lets you check if the size of the block requested is equal to or greater than the size of the free space your ptr is pointing to. 
+
+int perfect_fit_check(size_t size_block_wanted,uint8_t * ptr_to_block ){
+   ptr_to_block =   (uint32_t * )ptr_to_block ;
   size_t size_of_memory_block = (size_t ) ptr_to_block;
   if ((size_of_memory_block /2 ) > size_block_wanted ){
     return 0;
@@ -36,10 +45,56 @@ int perfect_fit_check(size_t size_block_wanted,unit8_t * ptr_to_block ){
   }else{ printf("WTF"); return 0;}
   
 }
+//given a size and a pointer to the chunck of free memory, this function allocates that space
+void fixed_allocate (size_t size_wanted, uint8_t *ptr ){
+  *ptr =(int) size_wanted ;
+  ptr ++;
+}
+//given a ptr to a particular memory block it splits it intwo two and hence changes the free list(this operation is done only on free blocks
+void split(uint8_t *ptr){
+  if ( (int) *(ptr++) ){//checks if the next of the block is 0 or not. if it isn't then it enters the if statement 
+    //----case 1 (the block is the last block of the freelist
+    int size_of_block = (int) *ptr ;
+    ptr = (uint32_t*) ptr ;
+  ptr ++;//pointing to next
+  int first_half_next = (int ) *ptr ;
+  *ptr = (size_of_block)/2;
+  ptr --;//pointing back to size again
+  uint8_t * second_half = ptr + (size_of_block)/2;
+  
+  *second_half =  (size_of_block)/2;
+  second_half ++;//pointing to the next of the second half
+  *second_half = first_half_next - ((size_of_block)/2);
+  }
+  else{
+   //----case 1 (the block is NOT the last block of the freelist
+  int size_of_block = (int) *ptr ;
+  ptr ++;//pointing to next
+  int first_half_next = (int ) *ptr ;
+  *ptr = (size_of_block)/2;
+  ptr --;//pointing back to size again
+  uint8_t * second_half = ptr + (size_of_block)/2;
+  
+  *second_half =  (size_of_block)/2;
+  second_half ++;//pointing to the next of the second half
+  *second_half = 0;
+        
+  }
 
-void allocate (
+}
+
+//this function cleans up(makes sure our ptr are in the right setup so that free list is correct)
+void * post_allocation(blocks * a_block){
+  
+}
+//this function finds the first block that can provide the size we want
+void * find_block(uint8_t * free_list){
+    struct ret_blocks ;
+    
 
 
+}
+		    
 
 
 
@@ -70,4 +125,6 @@ void free(void *memory_block) {
 void dump_memory_map(void) {
 
 }
-
+int main(){
+  return 0;
+}
