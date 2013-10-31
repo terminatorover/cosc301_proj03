@@ -54,8 +54,9 @@ void fixed_allocate (size_t size_wanted, uint8_t *ptr ){
 void split(uint8_t *ptr){
   if ( (int) *(ptr++) ){//checks if the next of the block is 0 or not. if it isn't then it enters the if statement 
     //----case 1 (the block is the last block of the freelist
-    int size_of_block = (int) *ptr ;
+
     ptr = (uint32_t*) ptr ;
+    int size_of_block = (int) *ptr ;
   ptr ++;//pointing to next
   int first_half_next = (int ) *ptr ;
   *ptr = (size_of_block)/2;
@@ -68,6 +69,7 @@ void split(uint8_t *ptr){
   }
   else{
    //----case 1 (the block is NOT the last block of the freelist
+    ptr = (uint32_t*) ptr ;
   int size_of_block = (int) *ptr ;
   ptr ++;//pointing to next
   int first_half_next = (int ) *ptr ;
@@ -88,10 +90,16 @@ void * post_allocation(blocks * a_block){
   
 }
 //this function finds the first block that can provide the size we want
-void * find_block(uint8_t * free_list){
+void * find_block(void * free_list, size_t size_wanted){
     struct ret_blocks ;
+    uint8_t *free_ptr = (uint8_t *)free_list;
     
-
+    int current_block_size = (int) *((uint32_t *)(free_ptr));
+    int current_next  = (int) *(((uint32_t *)(free_ptr))+1);
+    while ( current_block < size_wanted){
+      
+      
+    }
 
 }
 		    
