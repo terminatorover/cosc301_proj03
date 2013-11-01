@@ -86,7 +86,7 @@ void split(uint8_t *ptr){
 }
 
 //this function cleans up(makes sure our ptr are in the right setup so that free list is correct)
-void * post_allocation(blocks * a_block){
+void * post_allocation(void * a_block){
   
 }
 //this function finds the first block that can provide the size we want
@@ -96,9 +96,12 @@ void * find_block(void * free_list, size_t size_wanted){
     
     int current_block_size = (int) *((uint32_t *)(free_ptr));
     int current_next  = (int) *(((uint32_t *)(free_ptr))+1);
-    while ( current_block < size_wanted){
+    while ( current_block_size < size_wanted){
+      free_ptr = (uint8_t *) free_ptr ;
+      free_ptr += current_next ;//free_ptr pointing to the next block
       
-      
+      current_block_size = (int) *((uint32_t *)(free_ptr));
+      current_next  = (int) *(((uint32_t *)(free_ptr))+1);
     }
 
 }
