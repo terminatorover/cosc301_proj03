@@ -11,12 +11,7 @@
 #define FALSE 0
 #endif
 
-//helps to get both pointers to the a fitting free block and the last free block before that 
-struct blocks{
-  uint8_t * first_free;
-  uint8_t * second_free ;
 
-};
 
 // function declarations
 void *malloc(size_t);
@@ -90,22 +85,7 @@ void * post_allocation(void * a_block){
   
 }
 //this function finds the first block that can provide the size we want
-void * find_block(void * free_list, size_t size_wanted){
-    struct ret_blocks ;
-    uint8_t *free_ptr = (uint8_t *)free_list;
-    
-    int current_block_size = (int) *((uint32_t *)(free_ptr));
-    int current_next  = (int) *(((uint32_t *)(free_ptr))+1);
-    while ( current_block_size < size_wanted){
-      free_ptr = (uint8_t *) free_ptr ;
-      free_ptr += current_next ;//free_ptr pointing to the next block
-      
-      current_block_size = (int) *((uint32_t *)(free_ptr));
-      current_next  = (int) *(((uint32_t *)(free_ptr))+1);
-    }
 
-}
-		    
 
 
 
@@ -125,17 +105,83 @@ void *malloc(size_t request_size) {
         atexit(dump_memory_map);
     }
     void * free_list = heap_begin ;
+    int size_wanted = (int) request_size;
 
+    uint32_t * free_ptr = (uint32_t *)free_list;//free_ptr is pointing to the first int
+    
+    int current_block_size = (int) *(free_ptr );
+    
+    int current_next  = (int) *((free_ptr)+1);//
 
-}
+    int old_next ;
+    int old_block_size; 
+    while ( current_block_size < (int) size_wanted){
+      free_ptr = (uint8_t *) free_ptr ;
+      old_block_size = (int) *(free_ptr );//
+      old_next = (int) *((free_ptr)+1);//
+      
+      free_ptr += current_next ;//free_ptr pointing to the next block
+      
+      free_ptr = (uint32_t *)free_list;//free_ptr is pointing to the first int of the next block
 
-void free(void *memory_block) {
-
+      current_block_size = (int) *(free_ptr );//next block size
+      current_next  = (int) *((free_ptr)+1);//the next of the next 
+}  
+    free_ptr = (uint8_t *) free_ptr ;
+    uint8_t * old_ptr = free_ptr ;
+    old_ptr -= old_next ;//This is the a pointer to the old free chunck
+    
+}   
+    //-----------------------------------------------FREE LIST--------------------------
+void free(void *freeblock) {
+  if (freeblock == NULL){
+    return; //Do nothing
+  }
+  else{
+    if (freeblock < freelist){//may need to type to uint_32
+      uint32_t newoffset = (uint32_t)(freelist - freeblock);
+      uint32_t* tmp = (uint32_t *) ((uint32_t *) freeblock + 1);
+      * tmp = newoffset; // inputs in type uint8_t for offset
+      freelist = freeblock; 
+      return;
+    }
+    else{
+      uint32_t * tmp = freelist;
+      uint32_t off = (uint32_t) *((uint32_t *) tmp + 1);
+      uint32_t * prevptr;
+      uint32_t * prevoff;
+      while (tmp < (uint32_t *) freeblock){ //iterate until the next block after freeblock 
+	prevptr = tmp;
+	prevoff = ((uint32_t *) tmp + 1);
+	tmp = (uint32_t *) ((uint8_t *) tmp + (int) off);
+	off = * ((uint32_t *) tmp + 1);
+      }
+      uint32_t replaceoff = (uint32_t *) freeblock - prevptr;// offset to new block
+      uint32_t freeoff = tmp - (uint32_t) freeblock;// offset to subsequent block
+      * prevptr = replaceoff; 
+      tmp = (uint32_t *)freeblock + 1;
+      * tmp = freeoff; 
+      return;
+    }
+  }
 }
 
 void dump_memory_map(void) {
-
+  int place = 0;
+  uint32_t * tmp = heap_begin;
+  while(place < 1024*1024){
+    int size = (*tmp);
+    int offset = (int) *((uint32_t *)tmp + 1);
+    char* state;
+    if (offset == 0){state = "allocated";}
+    else{state = "free";}
+    printf("Block size : %d, offset %d, %s", size, offset,state);
+    place += size;
+    tmp =(uint8_t *)tmp + offset;
+      }
 }
+
+
 int main(){
   return 0;
 }
