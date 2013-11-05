@@ -130,20 +130,17 @@ void *malloc(size_t request_size) {
       last_next  = (int) *((free_ptr)+1);//byte offset for next free block
       trial += 1;
     }  if (trial ==0){//this means that we found the first free block to be big enough
-      
-      /*
-      //check if the size is equal
-      if( current_block_size == size_wanted){
-	free_ptr = (uint32_t *) free_ptr ;//just checking -saftey first
-	*free_ptr = size_wanted ;//assigned the first 4 bytes to the size requested+8bytes
-	free_ptr ++;//move the pointer to refer to next 
-	*free_ptr = 0;//assign the next to 0 because it is no longer free 
-	//if sie is not equal SPLIT
-	//-------------------split and repeat
-		
-      }
+      while (perfect_fit_check( (size_t)size_wanted, (uint8_t *)free_ptr ){//checks if the ptr we have is pointing to a memory block equal to the size we want
+	  split((uint8_t *)free_ptr);//if not we enter the loop and split
+	}
+	//when we fall out of the loop it means that our block's size is exactly 
+	//equal to the size requested so we allocate it 
+       fixed_allocate( (size_t)size_wanted, (uint8_t *)free_ptr );
+	
+	        
 
-    }*/
+      
+    }
     else( trial != 0){//this means if we found the first free block isn't big enough
     free_ptr = (uint8_t *) free_ptr ;
     uint8_t * old_ptr = free_ptr ;
