@@ -135,16 +135,30 @@ void *malloc(size_t request_size) {
 	}
 	//when we fall out of the loop it means that our block's size is exactly 
 	//equal to the size requested so we allocate it 
+	int next_leap_to_free_block = *(free_ptr ++);//get the offset to get to the next free block. this is important because when we allocate 
+    //we will lose the information about how many bytes to go forward to get the next free block.
+	free_list = (void *) free_ptr ;//UPDATE FREE_LIST
+      	
        fixed_allocate( (size_t)size_wanted, (uint8_t *)free_ptr );
-	
-	        
-
-      
     }
     else( trial != 0){//this means if we found the first free block isn't big enough
     free_ptr = (uint8_t *) free_ptr ;
     uint8_t * old_ptr = free_ptr ;
     old_ptr -= last_next ;//This is the a pointer to the old free chunck}
+    while (perfect_fit_check( (size_t)size_wanted, (uint8_t *)free_ptr ){//checks if the ptr we have is pointing to a memory block equal to the size we want
+	  split((uint8_t *)free_ptr);//if not we enter the loop and split
+	}
+	//when we fall out of the loop it means that our block's size is exactly 
+	//equal to the size requested so we allocate it 
+      free_ptr = (uint32_t *) free_ptr ;//makes sure that free_ptr points to the first int of the perfect fit block to be allocated
+      int next_leap_to_free_block = *(free_ptr ++);//get the offset to get to the next free block. this is important because when we allocate 
+    //we will lose the information about how many bytes to go forward to get the next free block.
+      fixed_allocate( (size_t)size_wanted, (uint8_t *)free_ptr );
+      old_ptr = (uint32_t *)old_ptr;
+      old_ptr ++;
+      *old_ptr += next_leap_to_free_block;//make sure the old_ptr's next is what it needs to be. 
+      
+
     
 }   
     //-----------------------------------------------FREE LIST--------------------------
