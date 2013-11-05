@@ -130,7 +130,7 @@ void *malloc(size_t request_size) {
       last_next  = (int) *((free_ptr)+1);//byte offset for next free block
       trial += 1;
     }  if (trial ==0){//this means that we found the first free block to be big enough
-      while (perfect_fit_check( (size_t)size_wanted, (uint8_t *)free_ptr ){//checks if the ptr we have is pointing to a memory block equal to the size we want
+      while (perfect_fit_check( ((size_t)size_wanted), ((uint8_t *)free_ptr ))){//checks if the ptr we have is pointing to a memory block equal to the size we want
 	  split((uint8_t *)free_ptr);//if not we enter the loop and split
 	}
 	//when we fall out of the loop it means that our block's size is exactly 
@@ -145,7 +145,9 @@ void *malloc(size_t request_size) {
     free_ptr = (uint8_t *) free_ptr ;
     uint8_t * old_ptr = free_ptr ;
     old_ptr -= last_next ;//This is the a pointer to the old free chunck}
-    while (perfect_fit_check( (size_t)size_wanted, (uint8_t *)free_ptr ){//checks if the ptr we have is pointing to a memory block equal to the size we want
+
+    while (perfect_fit_check( ((size_t)size_wanted), ((uint8_t *)free_ptr ))){//checks if the ptr we have is pointing to a memory block equal to the size we want
+      //the ptr we have is pointing to a memory block equal to the size we want
 	  split((uint8_t *)free_ptr);//if not we enter the loop and split
 	}
 	//when we fall out of the loop it means that our block's size is exactly 
@@ -157,7 +159,7 @@ void *malloc(size_t request_size) {
       old_ptr = (uint32_t *)old_ptr;
       old_ptr ++;
       *old_ptr += next_leap_to_free_block;//make sure the old_ptr's next is what it needs to be. 
-      
+      }      
 
     
 }   
