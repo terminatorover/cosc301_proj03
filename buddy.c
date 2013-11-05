@@ -80,6 +80,8 @@ void split(uint8_t *ptr){
 
 }
 
+
+
 //this function cleans up(makes sure our ptr are in the right setup so that free list is correct)
 void * post_allocation(void * a_block){
   
@@ -107,29 +109,45 @@ void *malloc(size_t request_size) {
     void * free_list = heap_begin ;
     int size_wanted = (int) request_size;
 
-    uint32_t * free_ptr = (uint32_t *)free_list;//free_ptr is pointing to the first int
+    uint32_t * free_ptr = (uint32_t *)free_list;//free_ptr is pointing to the first int of the free list 
     
-    int current_block_size = (int) *(free_ptr );
+    int current_block_size = (int) *(free_ptr);
     
     int current_next  = (int) *((free_ptr)+1);//
-
+    int last_next ;
     int old_next ;
     int old_block_size; 
+    int trial = 0; 
     while ( current_block_size < (int) size_wanted){
-      free_ptr = (uint8_t *) free_ptr ;
+      //      free_ptr = (uint32_t *) free_ptr ;//pointer pointing to the first int
       old_block_size = (int) *(free_ptr );//
       old_next = (int) *((free_ptr)+1);//
+      free_ptr = (uint8_t *)free_list;//free_ptr is pointing to the first byte of free block
+      free_ptr += old_next ;//free_ptr pointing to the next block
       
-      free_ptr += current_next ;//free_ptr pointing to the next block
+      free_ptr = (uint32_t *) free_ptr;//free_ptr is pointing to the first int of the next block
+      current_block_size = (int) *(free_ptr );// block size
+      last_next  = (int) *((free_ptr)+1);//byte offset for next free block
+      trial += 1;
+    }  if (trial ==0){//this means that we found the first free block to be big enough
       
-      free_ptr = (uint32_t *)free_list;//free_ptr is pointing to the first int of the next block
+      /*
+      //check if the size is equal
+      if( current_block_size == size_wanted){
+	free_ptr = (uint32_t *) free_ptr ;//just checking -saftey first
+	*free_ptr = size_wanted ;//assigned the first 4 bytes to the size requested+8bytes
+	free_ptr ++;//move the pointer to refer to next 
+	*free_ptr = 0;//assign the next to 0 because it is no longer free 
+	//if sie is not equal SPLIT
+	//-------------------split and repeat
+		
+      }
 
-      current_block_size = (int) *(free_ptr );//next block size
-      current_next  = (int) *((free_ptr)+1);//the next of the next 
-}  
+    }*/
+    else( trial != 0){//this means if we found the first free block isn't big enough
     free_ptr = (uint8_t *) free_ptr ;
     uint8_t * old_ptr = free_ptr ;
-    old_ptr -= old_next ;//This is the a pointer to the old free chunck
+    old_ptr -= last_next ;//This is the a pointer to the old free chunck}
     
 }   
     //-----------------------------------------------FREE LIST--------------------------
