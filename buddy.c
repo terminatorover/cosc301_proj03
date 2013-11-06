@@ -170,12 +170,14 @@ void *the_malloc(size_t request_size) {
 	      }
 	     //when we fall out of the loop it means that our block's size is exactly 
 	      //equal to the size requested so we allocate it 
-
+      uint8_t * for_alloc = (uint8_t *)free_ptr; 
 	     int next_leap_to_free_block = *(free_ptr ++);//get the offset to get to the next free block. this is important because when we allocate 
-	  //we will lose the information about how many bytes to go forward to get the next free block.
+	     //we will lose the information about how many bytes to go forward to get the next free block.
+	     free_ptr = (uint8_t *) free_ptr ; 
+	     free_ptr += next_leap_to_free_block;
 	      free_list = (void *) free_ptr ;//UPDATE FREE_LIST
 
-	     fixed_allocate( (size_t)size_wanted, (uint8_t *)free_ptr );
+	     fixed_allocate( (size_t)size_wanted, for_alloc );
     }
 
 
