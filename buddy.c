@@ -198,14 +198,58 @@ void *the_malloc(size_t request_size) {
 		 old_next =(uint32_t) *((uint32_t *)ptr_to_old +1 );
 		 old_next += next_leap_to_free_block;
 		 *((uint32_t *)ptr_to_old+1) = (uint32_t ) old_next ;
-		 
      
       }
 
     return (void *) free_ptr ;
 }   
+
+
+//-*******************************BUDDY FINDER **********************************
+
+void buddyup(){
+  int runagain = 1;
+  while (runagain){
+    runagain = 0;
+    int compare;
+    void * bit1, bit2;
+    uint32_t * prevptr = (uint32_t *) freelist;
+    uint32_t * curptr = (uint32_t *) ((uint8_t *) prevptr + ((int) * (prevptr + 1))); 
+    place = (int) curptr - (int) heap_begin;//not sure about this
+    //freelist should be a global variable
+    while(place < 1024*1024){//while in array
+      int prevsize = (int) *prevptr;
+      int cursize = (int) *curptr;
+      if (prevsize == cursize){
+compare = (int)prevptr & (int)curptr;
+if(compare == (int)prevptr){//they are buddies
+  //MERGE
+  * prevptr = prevsize * 2;//double first block size
+  * (prevptr+1) = ((int)* (prevptr+1))+ ((int)*(curptr + 1));
+  //assign new offset to sum of originals  
+  runagain = 1;
+  break;
+}
+else{
+  //not buddies
+  prevptr = curptr; 
+  curptr = (uint32_t *) ((uint8_t *) prevptr + ((int) * (prevptr + 1)));
+  place = (int) curptr - (int) heap_begin;//not sure about this
+}
+      }
+      else{
+prevptr = curptr; 
+        curptr = (uint32_t *) ((uint8_t *) prevptr + ((int) * (prevptr + 1)));
+place = (int) curptr - (int) heap_begin;//not sure about this
+      }
+    }
+  }
+  return;
+}
+
+//-*******************************BUDDY FINDER **********************************
     //-----------------------------------------------FREE LIST--------------------------
-/*
+
 void free(void *freeblock) {
   if (freeblock == NULL){
     return; //Do nothing
@@ -238,7 +282,7 @@ void free(void *freeblock) {
     }
   }
 }
-*/
+
 void dump_memory_map(void) {
   int place = 0;
   uint32_t * tmp = (uint32_t *) heap_begin;
@@ -273,6 +317,5 @@ int main(){
    char * ptr5 =  (char *) the_malloc(sizeof(char)*200000);
    
           dump_memory_map();
+
 }
-
-
