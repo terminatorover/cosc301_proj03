@@ -5,7 +5,7 @@
 #include <string.h>
 #include <stdint.h>
 #include <assert.h>
-
+#include <math.h>////?????????????????????????
 #ifndef TRUE
 #define TRUE 1
 #define FALSE 0
@@ -96,7 +96,7 @@ void * post_allocation(void * a_block){
 
 
 
-void *malloc(size_t request_size) {
+void *the_malloc(size_t request_size) {
 
     // if heap_begin is NULL, then this must be the first
     // time that malloc has been called.  ask for a new
@@ -107,7 +107,18 @@ void *malloc(size_t request_size) {
         atexit(dump_memory_map);
     }
     void * free_list = heap_begin ;
-    int size_wanted = (int) request_size;
+    int size_wanted; // = (int) request_size;
+
+    request_size += 8; //upping the value 
+    request_size = (int ) request_size; 
+    int power = 0;
+    while ( (int) pow(2,power) < (request_size )){//finding the next power of two
+      power +=1 ;
+    }
+    printf("\nthe result : %d\n", (int) pow(2, power));
+    size_wanted = (int ) pow(2, power); //this is the size we will actually be allocating
+
+
 
     uint32_t * free_ptr = (uint32_t *)free_list;//free_ptr is pointing to the first int of the free list 
     
@@ -146,7 +157,7 @@ void *malloc(size_t request_size) {
     }
 
 
-    else( trial != 0){//this means if we found the first free block isn't big enough
+    else{//this means if we found the first free block isn't big enough
 	  free_ptr = (uint8_t *) free_ptr ;
 	  uint8_t * old_ptr = free_ptr ;
 	  old_ptr -= last_next ;//This is the a pointer to the old free chunck}
@@ -168,20 +179,21 @@ void *malloc(size_t request_size) {
 
 }   
     //-----------------------------------------------FREE LIST--------------------------
+/*
 void free(void *freeblock) {
   if (freeblock == NULL){
     return; //Do nothing
   }
   else{
-    if (freeblock < freelist){//may need to type to uint_32
-      uint32_t newoffset = (uint32_t)(freelist - freeblock);
+    if (freeblock < free_list){//may need to type to uint_32
+      uint32_t newoffset = (uint32_t)(free_list - freeblock);
       uint32_t* tmp = (uint32_t *) ((uint32_t *) freeblock + 1);
       * tmp = newoffset; // inputs in type uint8_t for offset
-      freelist = freeblock; 
+      free_list = freeblock; 
       return;
     }
     else{
-      uint32_t * tmp = freelist;
+      uint32_t * tmp = free_list;
       uint32_t off = (uint32_t) *((uint32_t *) tmp + 1);
       uint32_t * prevptr;
       uint32_t * prevoff;
@@ -200,8 +212,8 @@ void free(void *freeblock) {
     }
   }
 }
-
-void dump_memory_map(void) {
+*/
+void the_dump_memory_map(void) {
   int place = 0;
   uint32_t * tmp = heap_begin;
   while(place < 1024*1024){
@@ -218,6 +230,8 @@ void dump_memory_map(void) {
 
 
 int main(){
-  return 0;
+  the_dump_memory_map();
+  char * ptr = (char *) the_malloc(sizeof(char)*20);
+  
 }
 
