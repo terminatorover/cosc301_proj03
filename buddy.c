@@ -49,7 +49,7 @@ void fixed_allocate (size_t size_wanted, uint8_t *ptr ){
 }
 //given a ptr to a particular memory block it splits it intwo two and hence changes the free list(this operation is done only on free blocks
 void split(uint8_t *ptr){
-  uint32_t * a_ptr = (uint32_t *) ptr ;
+   uint32_t * a_ptr = (uint32_t *) ptr ;
   a_ptr +=1; //pointing to next 
   if ( (int) *(a_ptr)==0 ){//checks if the next of the block is 0 or not. if it isn't then it enters the if statement 
     //----case 1 (the block is the last block of the freelist(because we only split free memory blocks
