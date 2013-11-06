@@ -49,17 +49,18 @@ void fixed_allocate (size_t size_wanted, uint8_t *ptr ){
 }
 //given a ptr to a particular memory block it splits it intwo two and hence changes the free list(this operation is done only on free blocks
 void split(uint8_t *ptr){
-  uint8_t * a_ptr = ptr ;
-  if ( (int) *(((uint32_t *)a_ptr)++) ){//checks if the next of the block is 0 or not. if it isn't then it enters the if statement 
+  uint32_t * a_ptr = (uint32_t *) ptr ;
+  
+  if ( (int) *(a_ptr++) ){//checks if the next of the block is 0 or not. if it isn't then it enters the if statement 
     //----case 1 (the block is the last block of the freelist(because we only split free memory blocks
   a_ptr = (uint32_t*) a_ptr ;
   int size_of_block = (int) *a_ptr ;
-  *a_ptr = size_of_block/2 ;
+  *a_ptr = size_of_block/2 ;//setting the size of the first half of the memory block
   a_ptr ++;//pointing to next
   int first_half_next = (int ) *a_ptr ;
   *a_ptr = (size_of_block)/2;//setting the magintude of the first half's next 
   a_ptr --;//pointing back to size again
-  uint8_t * second_half = (uint8_t *)a_ptr + (size_of_block)/2;
+  uint8_t * second_half = (uint8_t *)a_ptr + (size_of_block)/2;//pointing to the first byte of the next half
   second_half = (uint32_t *) second_half ;
   *second_half = (int) ((size_of_block)/2);//setting the size of the second half
   second_half ++;//pointing to the next of the second half
@@ -67,18 +68,18 @@ void split(uint8_t *ptr){
   }
   else{
    //----case 2 (the block is NOT the last block of the freelist
-    a_ptr = (uint32_t*) ptr ;
-  int size_of_block = (int) *ptr ;
+  a_ptr = (uint32_t*) a_ptr ;
+  int size_of_block = (int) *a_ptr ;
+  *a_ptr = size_of_block/2 ;//setting the size of the first half of the memory block
   a_ptr ++;//pointing to next
   int first_half_next = (int ) *a_ptr ;
-  *a_ptr = (size_of_block)/2;
+  *a_ptr = (size_of_block)/2;//setting the magintude of the first half's next 
   a_ptr --;//pointing back to size again
-  uint8_t * second_half = a_ptr + (size_of_block)/2;
-  
-  *second_half =  (size_of_block)/2;
+  uint8_t * second_half = (uint8_t *)a_ptr + (size_of_block)/2;//pointing to the first byte of the next half
+  second_half = (uint32_t *) second_half ;
+  *second_half = (int) ((size_of_block)/2);//setting the size of the second half
   second_half ++;//pointing to the next of the second half
   *second_half = 0;
-        
   }
 
 }
