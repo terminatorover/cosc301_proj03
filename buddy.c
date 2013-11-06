@@ -152,7 +152,7 @@ void *the_malloc(size_t request_size) {
       old_block_size = (int) *(free_ptr );//
       old_next = (int) *((free_ptr)+1);//
       ptr_to_old = free_ptr ;
-      free_ptr = (uint32_t *)(( uint8_t *)free_list + old_next );//free_ptr is pointing to the first byte of free block
+      free_ptr = (uint32_t *)(( uint8_t *)free_ptr + old_next );//free_ptr is pointing to the first byte of free block
 
       current_block_size = (int) *(free_ptr );// block size
       current_next  = (int) *((free_ptr)+1);//byte offset for next free block
@@ -265,7 +265,8 @@ int main(){
   dump_memory_map();
   char * ptr2 =  (char *) the_malloc(sizeof(char)*50);
   dump_memory_map();
-
+    char * ptr3 =  (char *) the_malloc(sizeof(char)*200);
+      dump_memory_map();
 }
 
 
