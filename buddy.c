@@ -144,13 +144,14 @@ void *the_malloc(size_t request_size) {
     printf("\ncurrent block size : %d size_wanted: %d\n", current_block_size, size_wanted);
     int old_next ;
     int old_block_size; 
-
+    uint32_t * ptr_to_old = free_ptr;
     int trial = 0; 
     while ( current_block_size < (int) size_wanted){
       //      free_ptr = (uint32_t *) free_ptr ;//pointer pointing to the first int
 
       old_block_size = (int) *(free_ptr );//
       old_next = (int) *((free_ptr)+1);//
+      ptr_to_old = free_ptr ;
       free_ptr = (uint32_t *)(( uint8_t *)free_list + old_next );//free_ptr is pointing to the first byte of free block
 
       current_block_size = (int) *(free_ptr );// block size
@@ -178,8 +179,8 @@ void *the_malloc(size_t request_size) {
 
 
     else{//this means if we found the first free block isn't big enough
-	  uint32_t * old_ptr = free_ptr ;
-	  old_ptr = (uint32_t *)((uint8_t*) old_ptr - current_next) ;//This is the a pointer to the old free chunck}
+      //	  uint32_t * old_ptr = free_ptr ;
+	  //	  old_ptr = (uint32_t *)((uint8_t*) old_ptr - old_next) ;//This is the a pointer to the old free chunck}
 
 
       while (perfect_fit_check( ((size_t)size_wanted), ((uint8_t *)free_ptr ))==0){//checks if the ptr we have is pointing to a memory block equal to the size we want
@@ -189,13 +190,15 @@ void *the_malloc(size_t request_size) {
 		   //when we fall out of the loop it means that our block's size is exactly 
 		   //equal to the size requested so we allocate it 
 
-		 int next_leap_to_free_block = *(free_ptr ++);//get the offset to get to the next free block. this is important because when we allocate 
+		 int next_leap_to_free_block = *(free_ptr +1);//get the offset to get to the next free block. this is important because when we allocate 
 	       //we will lose the information about how many bytes to go forward to get the next free block.
 		 
 		 fixed_allocate( (size_t)size_wanted, (uint8_t *)free_ptr );
 
-		 old_ptr ++;
-		 *old_ptr += (int) ( next_leap_to_free_block);//make sure the old_ptr's next is what it needs to be. 
+		 old_next =(uint32_t) *((uint32_t *)ptr_to_old +1 );
+		 old_next += next_leap_to_free_block;
+		 *((uint32_t *)ptr_to_old+1) = (uint32_t ) old_next ;
+		 
      
       }
 
