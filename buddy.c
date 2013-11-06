@@ -30,8 +30,8 @@ void *heap_begin = NULL;
 //perfect_fit_check , lets you check if the size of the block requested is equal to or greater than the size of the free space your ptr is pointing to. 
 
 int perfect_fit_check(size_t size_block_wanted,uint8_t * ptr_to_block ){
-   ptr_to_block =   (uint32_t * )ptr_to_block ;
-   int size_of_memory_block = (int) * ptr_to_block;
+  uint32_t * a_ptr_to_block =   (uint32_t * )ptr_to_block ;
+  int size_of_memory_block = (int) * a_ptr_to_block;
   if ((size_of_memory_block ) > size_block_wanted ){
     return 0;
   }else if ((size_of_memory_block ) == (size_block_wanted )){
@@ -42,22 +42,24 @@ int perfect_fit_check(size_t size_block_wanted,uint8_t * ptr_to_block ){
 }
 //given a size and a pointer to the chunck of free memory, this function allocates that space
 void fixed_allocate (size_t size_wanted, uint8_t *ptr ){
-  *ptr =(int) size_wanted ;//make sure the size of our block is equal to size_wanted
-  ptr ++;//get out pointer to point to "next" of our block
-  //  *ptr = 0;//get our blocks "next" to have the value 0 and hence allocated. 
+  uint32_t * a_ptr = (uint32_t *)ptr; 
+  *a_ptr =(int) size_wanted ;//make sure the size of our block is equal to size_wanted
+  a_ptr ++;//get out pointer to point to "next" of our block
+  *a_ptr = 0;//get our blocks "next" to have the value 0 and hence allocated. 
 }
 //given a ptr to a particular memory block it splits it intwo two and hence changes the free list(this operation is done only on free blocks
 void split(uint8_t *ptr){
-  if ( (int) *(ptr++) ){//checks if the next of the block is 0 or not. if it isn't then it enters the if statement 
+  uint8_t * a_ptr = ptr ;
+  if ( (int) *(a_ptr++) ){//checks if the next of the block is 0 or not. if it isn't then it enters the if statement 
     //----case 1 (the block is the last block of the freelist
 
-    ptr = (uint32_t*) ptr ;
-    int size_of_block = (int) *ptr ;
-  ptr ++;//pointing to next
-  int first_half_next = (int ) *ptr ;
-  *ptr = (size_of_block)/2;
-  ptr --;//pointing back to size again
-  uint8_t * second_half = ptr + (size_of_block)/2;
+    a_ptr = (uint32_t*) a_ptr ;
+    int size_of_block = (int) *a_ptr ;
+  a_ptr ++;//pointing to next
+  int first_half_next = (int ) *a_ptr ;
+  *a_ptr = (size_of_block)/2;
+  a_ptr --;//pointing back to size again
+  uint8_t * second_half = a_ptr + (size_of_block)/2;
   
   *second_half =  (size_of_block)/2;
   second_half ++;//pointing to the next of the second half
@@ -65,13 +67,13 @@ void split(uint8_t *ptr){
   }
   else{
    //----case 1 (the block is NOT the last block of the freelist
-    ptr = (uint32_t*) ptr ;
+    a_ptr = (uint32_t*) ptr ;
   int size_of_block = (int) *ptr ;
-  ptr ++;//pointing to next
-  int first_half_next = (int ) *ptr ;
-  *ptr = (size_of_block)/2;
-  ptr --;//pointing back to size again
-  uint8_t * second_half = ptr + (size_of_block)/2;
+  a_ptr ++;//pointing to next
+  int first_half_next = (int ) *a_ptr ;
+  *a_ptr = (size_of_block)/2;
+  a_ptr --;//pointing back to size again
+  uint8_t * second_half = a_ptr + (size_of_block)/2;
   
   *second_half =  (size_of_block)/2;
   second_half ++;//pointing to the next of the second half
