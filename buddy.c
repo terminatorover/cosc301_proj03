@@ -213,7 +213,7 @@ void free(void *freeblock) {
   }
 }
 */
-void the_dump_memory_map(void) {
+void dump_memory_map(void) {
   int place = 0;
   uint32_t * tmp = heap_begin;
   while(place < 1024*1024){
@@ -230,7 +230,7 @@ void the_dump_memory_map(void) {
 
 
 int main(){
-  the_dump_memory_map();
+  dump_memory_map();
   char * ptr = (char *) the_malloc(sizeof(char)*20);
   
 }
