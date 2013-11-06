@@ -31,10 +31,10 @@ void *heap_begin = NULL;
 
 int perfect_fit_check(size_t size_block_wanted,uint8_t * ptr_to_block ){
    ptr_to_block =   (uint32_t * )ptr_to_block ;
-  size_t size_of_memory_block = (size_t ) ptr_to_block;
-  if ((size_of_memory_block /2 ) > size_block_wanted ){
+   int size_of_memory_block = (int) * ptr_to_block;
+  if ((size_of_memory_block ) > size_block_wanted ){
     return 0;
-  }else if ((size_of_memory_block /2 ) == size_block_wanted ){
+  }else if ((size_of_memory_block ) == (size_block_wanted )){
     //allocate
     return 1;
   }else{ printf("WTF"); return 0;}
@@ -42,8 +42,9 @@ int perfect_fit_check(size_t size_block_wanted,uint8_t * ptr_to_block ){
 }
 //given a size and a pointer to the chunck of free memory, this function allocates that space
 void fixed_allocate (size_t size_wanted, uint8_t *ptr ){
-  *ptr =(int) size_wanted ;
-  ptr ++;
+  *ptr =(int) size_wanted ;//make sure the size of our block is equal to size_wanted
+  ptr ++;//get out pointer to point to "next" of our block
+  //  *ptr = 0;//get our blocks "next" to have the value 0 and hence allocated. 
 }
 //given a ptr to a particular memory block it splits it intwo two and hence changes the free list(this operation is done only on free blocks
 void split(uint8_t *ptr){
@@ -82,11 +83,9 @@ void split(uint8_t *ptr){
 
 
 
-//this function cleans up(makes sure our ptr are in the right setup so that free list is correct)
-void * post_allocation(void * a_block){
+
   
-}
-//this function finds the first block that can provide the size we want
+
 
 
 
@@ -107,6 +106,14 @@ void *the_malloc(size_t request_size) {
         atexit(dump_memory_map);
     }
     void * free_list = heap_begin ;
+    //initalize the free block(aka say we have 1024 bytes and the next is 0
+
+    uint32_t * free_ptr = (uint32_t *)free_list;//free_ptr is pointing to the first int of the free list 
+    *free_ptr = 1024;//size
+    free_ptr ++;
+    *free_ptr = 0;//next 
+
+    //---------Getting the right sized block---------------------
     int size_wanted; // = (int) request_size;
 
     request_size += 8; //upping the value 
@@ -117,10 +124,10 @@ void *the_malloc(size_t request_size) {
     }
     printf("\nthe result : %d\n", (int) pow(2, power));
     size_wanted = (int ) pow(2, power); //this is the size we will actually be allocating
+    //---------Getting the right sized block---------------------
 
 
 
-    uint32_t * free_ptr = (uint32_t *)free_list;//free_ptr is pointing to the first int of the free list 
     
     int current_block_size = (int) *(free_ptr);
     
@@ -131,6 +138,7 @@ void *the_malloc(size_t request_size) {
     int trial = 0; 
     while ( current_block_size < (int) size_wanted){
       //      free_ptr = (uint32_t *) free_ptr ;//pointer pointing to the first int
+      printf("\ncurren_block_size: %d  size_wanted: %d \n",(int) current_block_size,(int)size_wanted);
       old_block_size = (int) *(free_ptr );//
       old_next = (int) *((free_ptr)+1);//
       free_ptr = (uint8_t *)free_list;//free_ptr is pointing to the first byte of free block
@@ -215,23 +223,24 @@ void free(void *freeblock) {
 */
 void dump_memory_map(void) {
   int place = 0;
-  uint32_t * tmp = heap_begin;
+  uint32_t * tmp = (uint32_t *) heap_begin;
   while(place < 1024*1024){
-    int size = (*tmp);
+    int size = (int) *tmp;
     int offset = (int) *((uint32_t *)tmp + 1);
     char* state;
     if (offset == 0){state = "allocated";}
     else{state = "free";}
     printf("Block size : %d, offset %d, %s", size, offset,state);
     place += size;
-    tmp =(uint8_t *)tmp + offset;
+    tmp = (uint8_t *) tmp ; 
+    tmp  = tmp + offset;
       }
 }
 
-
 int main(){
-  dump_memory_map();
+
   char * ptr = (char *) the_malloc(sizeof(char)*20);
   
 }
+
 
