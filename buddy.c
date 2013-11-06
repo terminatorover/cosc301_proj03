@@ -267,6 +267,12 @@ int main(){
   dump_memory_map();
     char * ptr3 =  (char *) the_malloc(sizeof(char)*200);
       dump_memory_map();
+    char * ptr4 =  (char *) the_malloc(sizeof(char)*200);
+          dump_memory_map();
+	  printf("\nsize requried: 32\n");
+   char * ptr5 =  (char *) the_malloc(sizeof(char)*200000);
+   
+          dump_memory_map();
 }
 
 
