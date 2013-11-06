@@ -115,7 +115,9 @@ void *the_malloc(size_t request_size) {
     }
     
     if (free_list==NULL){
-      free_list = heap_begin ; 
+      free_list = heap_begin;
+      *((uint32_t*) free_list) = 1024*1024;
+      *((uint32_t*)free_list+1) = 0;
     }
     //initalize the free block(aka say we have 1024 bytes and the next is 0
 
