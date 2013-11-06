@@ -37,7 +37,7 @@ int perfect_fit_check(size_t size_block_wanted,uint8_t * ptr_to_block ){
   }else if ((size_of_memory_block ) == (size_block_wanted )){
     //allocate
     return 1;
-  }else{ printf("WTF"); return 0;}
+  }else{ printf("NOT POSSIBLE"); return 0;}
   
 }
 //given a size and a pointer to the chunck of free memory, this function allocates that space
@@ -50,9 +50,10 @@ void fixed_allocate (size_t size_wanted, uint8_t *ptr ){
 //given a ptr to a particular memory block it splits it intwo two and hence changes the free list(this operation is done only on free blocks
 void split(uint8_t *ptr){
   uint32_t * a_ptr = (uint32_t *) ptr ;
-  
-  if ( (int) *(a_ptr++) ){//checks if the next of the block is 0 or not. if it isn't then it enters the if statement 
+  a_ptr +=1; //pointing to next 
+  if ( (int) *(a_ptr)==0 ){//checks if the next of the block is 0 or not. if it isn't then it enters the if statement 
     //----case 1 (the block is the last block of the freelist(because we only split free memory blocks
+  a_ptr -=1 ;//pointing to the "size"
   a_ptr = (uint32_t*) a_ptr ;
   int size_of_block = (int) *a_ptr ;
   *a_ptr = size_of_block/2 ;//setting the size of the first half of the memory block
@@ -67,6 +68,8 @@ void split(uint8_t *ptr){
   *second_half = first_half_next - ((size_of_block)/2);
   }
   else{
+    a_ptr -=1 ;//pointing to the "size"
+
    //----case 2 (the block is NOT the last block of the freelist
   a_ptr = (uint32_t*) a_ptr ;
   int size_of_block = (int) *a_ptr ;
@@ -81,7 +84,7 @@ void split(uint8_t *ptr){
   second_half ++;//pointing to the next of the second half
   *second_half = 0;
   }
-
+  printf("\nPRint Just Ran\n");
 }
 
 
