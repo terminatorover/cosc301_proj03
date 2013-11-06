@@ -103,15 +103,17 @@ void *the_malloc(size_t request_size) {
     // the heap begin pointer.
     if (!heap_begin) {
         heap_begin = mmap(NULL, HEAPSIZE, PROT_READ|PROT_WRITE, MAP_ANON|MAP_PRIVATE, -1, 0);
-        atexit(dump_memory_map);
+        //atexit(dump_memory_map);
     }
+    
     void * free_list = heap_begin ;
     //initalize the free block(aka say we have 1024 bytes and the next is 0
 
     uint32_t * free_ptr = (uint32_t *)free_list;//free_ptr is pointing to the first int of the free list 
-    *free_ptr = 1024;//size
+    *free_ptr = (int)pow(2,21);//size
     free_ptr ++;
     *free_ptr = 0;//next 
+    free_ptr --;//get free_ptr pointing to the head of the meomory block again 
 
     //---------Getting the right sized block---------------------
     int size_wanted; // = (int) request_size;
@@ -127,7 +129,7 @@ void *the_malloc(size_t request_size) {
     //---------Getting the right sized block---------------------
 
 
-
+    
     
     int current_block_size = (int) *(free_ptr);
     
@@ -183,8 +185,9 @@ void *the_malloc(size_t request_size) {
 		 old_ptr = (uint32_t *)old_ptr;
 		 old_ptr ++;
 		 *old_ptr += next_leap_to_free_block;//make sure the old_ptr's next is what it needs to be. 
+     
       }
-
+    dump_memory_map();
 }   
     //-----------------------------------------------FREE LIST--------------------------
 /*
@@ -224,7 +227,8 @@ void free(void *freeblock) {
 void dump_memory_map(void) {
   int place = 0;
   uint32_t * tmp = (uint32_t *) heap_begin;
-  while(place < 1024*1024){
+  
+  while(place < (int) pow(2,20)){
     int size = (int) *tmp;
     int offset = (int) *((uint32_t *)tmp + 1);
     char* state;
@@ -233,7 +237,8 @@ void dump_memory_map(void) {
     printf("Block size : %d, offset %d, %s", size, offset,state);
     place += size;
     tmp = (uint8_t *) tmp ; 
-    tmp  = tmp + offset;
+    //    tmp  = tmp + offset;//---anna's
+    tmp = tmp + size ;//this includes the memory blocks that have been allocated 
       }
 }
 
