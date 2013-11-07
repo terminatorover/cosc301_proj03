@@ -14,8 +14,8 @@
 
 
 // function declarations
-void *malloc(size_t);
-void free(void *);
+void *the_malloc(size_t);
+void the_free(void *);
 void dump_memory_map(void);
 
 
@@ -53,7 +53,7 @@ void split(uint8_t *ptr){
   uint32_t * a_ptr = (uint32_t *) ptr ;
   a_ptr +=1; //pointing to next 
   if ( (((int) *a_ptr))!=0 ){//checks if the next of the block is 0 or not. if it isn't then it enters the nn/if statement 
-    //----case 1 (the block is the last block of the freelist(because we only split free memory blocks
+    //----case 1 (the block is the last block of the free_list(because we only split free memory blocks
   a_ptr -=1 ;//pointing to the "size"
 
   int size_of_block = (int) *a_ptr ;
@@ -72,7 +72,7 @@ void split(uint8_t *ptr){
   else{
   a_ptr -=1 ;//pointing to the "size"
 
-   //----case 2 (the block is NOT the last block of the freelist
+   //----case 2 (the block is NOT the last block of the free_list
 
   int size_of_block = (int) *a_ptr ;
   *a_ptr = size_of_block/2 ;//setting the size of the first half of the memory block
@@ -175,6 +175,7 @@ void *the_malloc(size_t request_size) {
      free_list = (void *) free_ptr ;//UPDATE FREE_LIST
 
      fixed_allocate( (size_t)size_wanted, for_alloc );
+     return (void *) for_alloc; 
     }
 
 
@@ -199,24 +200,25 @@ void *the_malloc(size_t request_size) {
 		 old_next += next_leap_to_free_block;
 		 *((uint32_t *)ptr_to_old+1) = (uint32_t ) old_next ;
      
-      }
+    }
 
     return (void *) free_ptr ;
 }   
 
 
 //-*******************************BUDDY FINDER **********************************
-
+/*
 void buddyup(){
   int runagain = 1;
   while (runagain){
     runagain = 0;
     int compare;
-    void * bit1, bit2;
-    uint32_t * prevptr = (uint32_t *) freelist;
+    void * bit1;
+      void * bit2 ; 
+    uint32_t * prevptr = (uint32_t *) free_list;
     uint32_t * curptr = (uint32_t *) ((uint8_t *) prevptr + ((int) * (prevptr + 1))); 
-    place = (int) curptr - (int) heap_begin;//not sure about this
-    //freelist should be a global variable
+    int place = (int) curptr - (int) heap_begin;//not sure about this
+    //free_list should be a global variable
     while(place < 1024*1024){//while in array
       int prevsize = (int) *prevptr;
       int cursize = (int) *curptr;
@@ -246,19 +248,34 @@ place = (int) curptr - (int) heap_begin;//not sure about this
   }
   return;
 }
+*/
 
 //-*******************************BUDDY FINDER **********************************
     //-----------------------------------------------FREE LIST--------------------------
 
-void free(void *freeblock) {
+void the_free(void *freeblock) {
+  uint32_t *itr = heap_begin;
+  // while (*( (uint32) itr)+1 ) ==0 ){
+    
+  // }
+  printf("\nNOOOOOOOOOO\n");
+  dump_memory_map();
   if (freeblock == NULL){
     return; //Do nothing
   }
   else{
-    if (freeblock < free_list){//may need to type to uint_32
-      uint32_t newoffset = (uint32_t)(free_list - freeblock);
+    if ((int)freeblock < (int)free_list){//may need to type to uint_32
+      printf("\n OHHHHHHHHHHHHHH\n");
+      int offset = 0;
+      itr = (uint32_t *) freeblock;
+      while(itr != (uint32_t *) free_list ){
+	offset += (int) *itr;
+	itr += *itr;
+      }
+      //      uint32_t newoffset = (uint32_t)(free_list - freeblock);
+
       uint32_t* tmp = (uint32_t *) ((uint32_t *) freeblock + 1);
-      * tmp = newoffset; // inputs in type uint8_t for offset
+      * tmp = offset; // inputs in type uint8_t for offset
       free_list = freeblock; 
       return;
     }
@@ -273,9 +290,11 @@ void free(void *freeblock) {
 	tmp = (uint32_t *) ((uint8_t *) tmp + (int) off);
 	off = * ((uint32_t *) tmp + 1);
       }
-      uint32_t replaceoff = (uint32_t *) freeblock - prevptr;// offset to new block
-      uint32_t freeoff = tmp - (uint32_t) freeblock;// offset to subsequent block
-      * prevptr = replaceoff; 
+      int replaceoff = ((int)((uint8_t *) freeblock - (uint8_t *) prevptr));
+
+      printf("\n freeblock- prevptr : %d\n",(int)((uint8_t *) freeblock - (uint8_t *) prevptr));
+      uint32_t freeoff = (uint8_t *)tmp - (uint8_t *) freeblock;// offset to subsequent blo
+     * (prevptr+1) = replaceoff; 
       tmp = (uint32_t *)freeblock + 1;
       * tmp = freeoff; 
       return;
@@ -283,7 +302,8 @@ void free(void *freeblock) {
   }
 }
 
-void dump_memory_map(void) {
+///-----------------------------DUMP MEMORY MAP --------------------------------
+void dump_memory_map(void  ) {
   int place = 0;
   uint32_t * tmp = (uint32_t *) heap_begin;
   
@@ -301,9 +321,10 @@ void dump_memory_map(void) {
       }
 }
 
+///-----------------------------DUMP MEMORY MAP --------------------------------
 int main(){
-
-
+  /*
+  // our test
   char * ptr = (char *) the_malloc(sizeof(char)*20);
   printf("\nSecond malloc\n");
   dump_memory_map();
@@ -317,5 +338,26 @@ int main(){
    char * ptr5 =  (char *) the_malloc(sizeof(char)*200000);
    
           dump_memory_map();
+	  */
+  //Pr's test 
+  
+  void *m1 = the_malloc(50);  // should allocate 64 bytes
+  void *m2 = the_malloc(100); // should allocate 128 bytes
+  //  the_free(m1);
 
+  dump_memory_map();
+  printf("\nheap begin - m1: %d\n", (int)(heap_begin - m1));
+  printf("\nheap begin - m2: %d\n", (int)(heap_begin - m2));
+  /* 
+  void *m3 = the_malloc(56);  // should allocate 64 bytes
+  void *m4 = the_malloc(11);  // should allocate 32 bytes
+  //   the_free(m3);
+  void *m5 = the_malloc(30);  // should allocate 64 bytes
+  void *m6 = the_malloc(120); // should allocate 128 bytes
+  dump_memory_map();
+  //  the_free(m2);
+  */
+  return 0;
+
+  
 }
