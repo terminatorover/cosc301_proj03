@@ -269,19 +269,7 @@ void the_free(void *freeblock) {
       *(((uint32_t *)freeblock) + 1 ) = (int )((uint8_t *)free_list - (uint8_t *)freeblock);       
 
       free_list = freeblock ;
-      /*
-      int offset = 0;
-      itr = (uint32_t *) freeblock;
-      while(itr != (uint32_t *) free_list ){
-	offset += (int) *itr;
-	itr += *itr;
-      }
-      //      uint32_t newoffset = (uint32_t)(free_list - freeblock);
 
-      uint32_t* tmp = (uint32_t *) ((uint32_t *) freeblock + 1);
-      * tmp = offset; // inputs in type uint8_t for offset
-      free_list = freeblock; 
-      */
 
       return;
     }
@@ -310,8 +298,8 @@ void the_free(void *freeblock) {
 void dump_memory_map(void  ) {
   int place = 0;
   uint32_t * tmp = (uint32_t *) heap_begin;
-  int count = 0; 
-  while(place < (int) pow(2,20) && count < 30){
+
+  while(place < (int) pow(2,20) ){
     int size = (int) *tmp;
     int offset = (int) *((uint32_t *)tmp + 1);
     char* state;
@@ -320,7 +308,7 @@ void dump_memory_map(void  ) {
     printf("\nBlock size : %d, offset %d, %s, %d \n", size, offset,state, (int) tmp);
     place += size;
     tmp = (uint32_t *)((uint8_t *) tmp + size ); 
-    count +=1 ;
+
     //    tmp  = tmp + offset;//---anna's
 
       }
