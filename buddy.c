@@ -259,13 +259,17 @@ void the_free(void *freeblock) {
     
   // }
   printf("\nNOOOOOOOOOO\n");
-  dump_memory_map();
+
   if (freeblock == NULL){
     return; //Do nothing
   }
   else{
-    if ((int)freeblock < (int)free_list){//may need to type to uint_32
+    if ((int)freeblock <= (int)free_list){//may need to type to uint_32-----CHANGEEEDDDDDDDDDDDDD <=
       printf("\n OHHHHHHHHHHHHHH\n");
+      *(((uint32_t *)freeblock) + 1 ) = (int )((uint8_t *)free_list - (uint8_t *)freeblock);       
+
+      free_list = freeblock ;
+      /*
       int offset = 0;
       itr = (uint32_t *) freeblock;
       while(itr != (uint32_t *) free_list ){
@@ -277,28 +281,28 @@ void the_free(void *freeblock) {
       uint32_t* tmp = (uint32_t *) ((uint32_t *) freeblock + 1);
       * tmp = offset; // inputs in type uint8_t for offset
       free_list = freeblock; 
+      */
+
       return;
     }
     else{
       uint32_t * tmp = free_list;
-      uint32_t off = (uint32_t) *((uint32_t *) tmp + 1);
-      uint32_t * prevptr;
-      uint32_t * prevoff;
-      while (tmp < (uint32_t *) freeblock){ //iterate until the next block after freeblock 
-	prevptr = tmp;
-	prevoff = ((uint32_t *) tmp + 1);
-	tmp = (uint32_t *) ((uint8_t *) tmp + (int) off);
-	off = * ((uint32_t *) tmp + 1);
+      uint32_t * before ; 
+      uint32_t * after ; 
+      int jump_by ; 
+      //idea --if you are using free list to jump then you eihter past it or before it 
+      while (tmp < (uint32_t *)freeblock ){
+	before = tmp ; 
+	jump_by = (int)*( tmp +1);
+	tmp = (uint32_t *) (((uint8_t *)tmp) + jump_by ); 
+	after = tmp ; 
       }
-      int replaceoff = ((int)((uint8_t *) freeblock - (uint8_t *) prevptr));
-
-      printf("\n freeblock- prevptr : %d\n",(int)((uint8_t *) freeblock - (uint8_t *) prevptr));
-      uint32_t freeoff = (uint8_t *)tmp - (uint8_t *) freeblock;// offset to subsequent blo
-     * (prevptr+1) = replaceoff; 
-      tmp = (uint32_t *)freeblock + 1;
-      * tmp = freeoff; 
+      *(before +1 ) = (int)((uint8_t *)freeblock - (uint8_t *)before);
+      *(((uint32_t *)freeblock) + 1 ) += (int)((uint8_t *)after - (uint8_t *)freeblock);       
       return;
-    }
+
+    
+   }
   }
 }
 
@@ -306,8 +310,8 @@ void the_free(void *freeblock) {
 void dump_memory_map(void  ) {
   int place = 0;
   uint32_t * tmp = (uint32_t *) heap_begin;
-  
-  while(place < (int) pow(2,20)){
+  int count = 0; 
+  while(place < (int) pow(2,20) && count < 30){
     int size = (int) *tmp;
     int offset = (int) *((uint32_t *)tmp + 1);
     char* state;
@@ -316,6 +320,7 @@ void dump_memory_map(void  ) {
     printf("\nBlock size : %d, offset %d, %s, %d \n", size, offset,state, (int) tmp);
     place += size;
     tmp = (uint32_t *)((uint8_t *) tmp + size ); 
+    count +=1 ;
     //    tmp  = tmp + offset;//---anna's
 
       }
@@ -343,11 +348,13 @@ int main(){
   
   void *m1 = the_malloc(50);  // should allocate 64 bytes
   void *m2 = the_malloc(100); // should allocate 128 bytes
-  //  the_free(m1);
+  void * m3 = the_malloc(51);
+    the_free(m1);
+  dump_memory_map();
+  the_free(m2);
 
   dump_memory_map();
-  printf("\nheap begin - m1: %d\n", (int)(heap_begin - m1));
-  printf("\nheap begin - m2: %d\n", (int)(heap_begin - m2));
+
   /* 
   void *m3 = the_malloc(56);  // should allocate 64 bytes
   void *m4 = the_malloc(11);  // should allocate 32 bytes
